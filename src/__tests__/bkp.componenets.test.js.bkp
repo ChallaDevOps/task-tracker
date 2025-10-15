@@ -1,0 +1,46 @@
+import React from 'react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
+import '@testing-library/jest-dom';
+
+import AddTask from '../components/AddTask';
+import Task from '../components/Task';
+import TaskList from '../components/TaskList';
+import Header from '../components/Header';
+
+describe('AddTask', () => {
+  test('calls onAdd with input text when submitted', () => {
+    const onAdd = jest.fn();
+    render(<AddTask onAdd={onAdd} />);
+
+    const input = screen.getByPlaceholderText(/add a new task/i);
+    fireEvent.change(input, { target: { value: 'Test Task' } });
+    fireEvent.click(screen.getByRole('button', { name: /add/i }));
+
+    expect(onAdd).toHaveBeenCalledWith('Test Task');
+    expect(onAdd).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Task', () => {
+  const task = { id: 1, text: 'Sample Task', completed: false };
+
+  test('renders task text', () => {
+    render(<ul><Task task={task} onDelete={jest.fn()} onToggle={jest.fn()} /></ul>);
+    expect(screen.getByText('Sample Task')).toBeInTheDocument();
+  });
+});
+
+describe('TaskList', () => {
+  test('renders message when no tasks', () => {
+    render(<TaskList tasks={[]} onDelete={jest.fn()} onToggle={jest.fn()} />);
+    expect(screen.getByText(/no tasks to show/i)).toBeInTheDocument();
+  });
+});
+
+describe('Header', () => {
+  test('renders the title', () => {
+    render(<Header />);
+    expect(screen.getByText(/task tracker/i)).toBeInTheDocument();
+  });
+});
+
